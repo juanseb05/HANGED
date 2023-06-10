@@ -1,179 +1,224 @@
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class HangmanGame extends Application {
+    private static final String SECRET_WORD = "HANGMAN";
+    private static final int MAX_ERRORS = 6;
 
-    private int maxGuesses = 6;
-    private String secretWord = "hangman";
-    private StringBuilder guessedWordBuilder;
-    private int incorrectGuesses = 0;
-    private int hangmanParts = 0;
+    private int incorrectGuesses;
+    private String guessedWord;
 
-    private Label wordLabel;
-    private Label guessesLabel;
-    private TextField guessField;
+    private Text guessedWordText;
+    private TextField letterInput;
     private Button guessButton;
+    private Group hangmanContainer;
 
     @Override
     public void start(Stage primaryStage) {
-        guessedWordBuilder = new StringBuilder(secretWord.length());
-        guessedWordBuilder.setLength(secretWord.length());
-        guessedWordBuilder.setCharAt(0, secretWord.charAt(0)); // Mostrar la primera letra de la palabra secreta
+        incorrectGuesses = 0;
+        guessedWord = "";
 
-        wordLabel = new Label();
-        guessesLabel = new Label();
+        // Hangman visual
+        hangmanContainer = new Group();
 
-        guessField = new TextField();
+        // Guessed word text
+        guessedWordText = new Text();
+        guessedWordText.getStyleClass().add("guessed-word");
+
+        // Letter input field
+        letterInput = new TextField();
+        letterInput.setPrefWidth(40);
+
+        // Guess button
         guessButton = new Button("Guess");
         guessButton.setOnAction(e -> handleGuess());
 
-        HBox inputBox = new HBox(guessField, guessButton);
-        inputBox.setSpacing(10);
-        inputBox.setAlignment(Pos.CENTER);
-
-        VBox root = new VBox(wordLabel, guessesLabel, inputBox);
-        root.setSpacing(20);
+        // Layout
+        VBox root = new VBox(10);
         root.setAlignment(Pos.CENTER);
+        root.setPadding(new Insets(20));
+        root.getStyleClass().add("root");
+        root.getChildren().addAll(hangmanContainer, guessedWordText, createInputPane());
 
-        updateWordLabel();
-        updateGuessesLabel();
+        Scene scene = new Scene(root, 400, 300);
+        scene.getStylesheets().add("style.css");
 
-        Scene scene = new Scene(root, 400, 200);
         primaryStage.setTitle("Hangman Game");
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        initializeGuessedWord();
+        updateGuessedWordText();
     }
 
     private void handleGuess() {
-        String guess = guessField.getText().toLowerCase();
-        guessField.clear();
+        String letter = letterInput.getText().toUpperCase();
+        letterInput.clear();
 
-        if (guess.length() != 1) {
-            showAlert("Invalid guess! Please enter a single letter.");
-            return;
-        }
-
-        if (guessedWordBuilder.toString().contains(guess)) {
-            showAlert("You already guessed that letter!");
-            return;
-        }
-
-        boolean correctGuess = false;
-        for (int i = 0; i < secretWord.length(); i++) {
-            if (secretWord.charAt(i) == guess.charAt(0)) {
-                guessedWordBuilder.setCharAt(i, guess.charAt(0));
-                correctGuess = true;
+        if (letter.length() == 1 && Character.isLetter(letter.charAt(0))) {
+            if (guessedWord.contains(letter)) {
+                // Letter already guessed
+                return;
             }
-        }
 
-        if (correctGuess) {
-            updateWordLabel();
+            boolean correctGuess = false;
 
-            if (guessedWordBuilder.toString().equals(secretWord)) {
-                // Player wins
-                showAlert("Congratulations! You guessed the word: " + secretWord);
-                resetGame();
+            for (int i = 0; i < SECRET_WORD.length(); i++) {
+                if (SECRET_WORD.charAt(i) == letter.charAt(0)) {
+                    StringBuilder sb = new StringBuilder(guessedWord);
+                    sb.setCharAt(i, letter.charAt(0));
+                    guessedWord = sb.toString();
+                    correctGuess = true;
+                }
             }
-        } else {
-            incorrectGuesses++;
-            hangmanParts++;
-            updateWordLabel();
-            updateGuessesLabel();
-            drawHangman();
 
-            if (incorrectGuesses >= maxGuesses) {
-                // Player loses
-                showAlert("Game Over! The word was: " + secretWord);
-                resetGame();
+            if (!correctGuess) {
+                incorrectGuesses++;
+                drawHangman();
             }
+
+            updateGuessedWordText();
+            checkGameStatus();
         }
     }
 
-    private void updateWordLabel() {
-        StringBuilder displayWordBuilder = new StringBuilder(guessedWordBuilder.length() * 2);
-        for (int i = 0; i < guessedWordBuilder.length(); i++) {
-            char c = guessedWordBuilder.charAt(i);
-            if (c == '\0') {
-                displayWordBuilder.append("_ ");
+    private void initializeGuessedWord() {
+        guessedWord = "";
+        for (int i = 0; i < SECRET_WORD.length(); i++) {
+            if (Character.isLetter(SECRET_WORD.charAt(i))) {
+                guessedWord += "_";
             } else {
-                displayWordBuilder.append(c).append(" ");
+                guessedWord += SECRET_WORD.charAt(i);
             }
         }
-        wordLabel.setText("Word: " + displayWordBuilder.toString());
     }
 
-    private void updateGuessesLabel() {
-        guessesLabel.setText("Incorrect Guesses: " + incorrectGuesses + " / " + maxGuesses);
+    private void updateGuessedWordText() {
+        StringBuilder sb = new StringBuilder();
+
+        for (char c : guessedWord.toCharArray()) {
+            sb.append(c).append(" ");
+        }
+
+        guessedWordText.setText(sb.toString());
+    }
+
+    private void checkGameStatus() {
+        if (guessedWord.equals(SECRET_WORD)) {
+            showMessage("Congratulations! You guessed the word!");
+            disableInput();
+        } else if (incorrectGuesses == MAX_ERRORS) {
+            showMessage("Game Over! You reached the maximum number of incorrect guesses.");
+            disableInput();
+        }
+    }
+
+    private void showMessage(String message) {
+        Text messageText = new Text(message);
+        messageText.getStyleClass().add("message");
+        VBox root = (VBox) guessedWordText.getParent();
+        root.getChildren().add(messageText);
+    }
+
+    private void disableInput() {
+        letterInput.setDisable(true);
+        guessButton.setDisable(true);
     }
 
     private void drawHangman() {
-        // Draw different parts of the hangman based on the number of incorrect guesses
-        StringBuilder hangmanBuilder = new StringBuilder();
+        hangmanContainer.getChildren().clear();
 
-        hangmanBuilder.append("   ____\n");
-        hangmanBuilder.append("  |    |\n");
-
-        switch (hangmanParts) {
-            case 1:
-                hangmanBuilder.append("  |    O\n");
-                break;
-            case 2:
-                hangmanBuilder.append("  |    O\n");
-                hangmanBuilder.append("  |    |\n");
-                break;
-            case 3:
-                hangmanBuilder.append("  |    O\n");
-                hangmanBuilder.append("  |   /|\n");
-                break;
-            case 4:
-                hangmanBuilder.append("  |    O\n");
-                hangmanBuilder.append("  |   /|\\\n");
-                break;
-            case 5:
-                hangmanBuilder.append("  |    O\n");
-                hangmanBuilder.append("  |   /|\\\n");
-                hangmanBuilder.append("  |   /\n");
-                break;
-            case 6:
-                hangmanBuilder.append("  |    O\n");
-                hangmanBuilder.append("  |   /|\\\n");
-                hangmanBuilder.append("  |   / \\\n");
-                break;
+        if (incorrectGuesses >= 1) {
+            Circle head = new Circle(20);
+            head.setTranslateY(40);
+            head.getStyleClass().add("head");
+            hangmanContainer.getChildren().add(head);
         }
 
-        hangmanBuilder.append("  |\n");
-        hangmanBuilder.append("_______\n");
+        if (incorrectGuesses >= 2) {
+            Line body = new Line();
+            body.setStartX(0);
+            body.setStartY(60);
+            body.setEndX(0);
+            body.setEndY(140);
+            body.getStyleClass().add("body");
+            hangmanContainer.getChildren().add(body);
+        }
 
-        System.out.println(hangmanBuilder.toString());
+        if (incorrectGuesses >= 3) {
+            Line leftArm = new Line();
+            leftArm.setStartX(-20);
+            leftArm.setStartY(80);
+            leftArm.setEndX(-60);
+            leftArm.setEndY(100);
+            leftArm.getStyleClass().add("arm");
+            hangmanContainer.getChildren().add(leftArm);
+        }
+
+        if (incorrectGuesses >= 4) {
+            Line rightArm = new Line();
+            rightArm.setStartX(20);
+            rightArm.setStartY(80);
+            rightArm.setEndX(60);
+            rightArm.setEndY(100);
+            rightArm.getStyleClass().add("arm");
+            hangmanContainer.getChildren().add(rightArm);
+        }
+
+        if (incorrectGuesses >= 5) {
+            Line leftLeg = new Line();
+            leftLeg.setStartX(-20);
+            leftLeg.setStartY(160);
+            leftLeg.setEndX(-60);
+            leftLeg.setEndY(200);
+            leftLeg.getStyleClass().add("leg");
+            hangmanContainer.getChildren().add(leftLeg);
+        }
+
+        if (incorrectGuesses >= 6) {
+            Line rightLeg = new Line();
+            rightLeg.setStartX(20);
+            rightLeg.setStartY(160);
+            rightLeg.setEndX(60);
+            rightLeg.setEndY(200);
+            rightLeg.getStyleClass().add("leg");
+            hangmanContainer.getChildren().add(rightLeg);
+        }
     }
 
-    private void resetGame() {
-        guessedWordBuilder.setLength(secretWord.length());
-        guessedWordBuilder.setCharAt(0, secretWord.charAt(0));
-        incorrectGuesses = 0;
-        hangmanParts = 0;
-        updateWordLabel();
-        updateGuessesLabel();
-    }
+    private GridPane createInputPane() {
+        GridPane inputPane = new GridPane();
+        inputPane.setAlignment(Pos.CENTER);
+        inputPane.setHgap(10);
+        inputPane.setVgap(5);
 
-    private void showAlert(String message) {
-        Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle("Hangman Game");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        Label letterLabel = new Label("Enter a letter:");
+        inputPane.add(letterLabel, 0, 0);
+        inputPane.add(letterInput, 1, 0);
+        inputPane.add(guessButton, 2, 0);
+
+        return inputPane;
     }
 
     public static void main(String[] args) {
         launch(args);
     }
 }
+
+
+
+
+
