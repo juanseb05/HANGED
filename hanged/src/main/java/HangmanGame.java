@@ -36,7 +36,7 @@ public class HangmanGame extends Application {
 
         // Guessed word text
         guessedWordText = new Text();
-        guessedWordText.getStyleClass().add("guessed-word");
+        guessedWordText.setStyle("-fx-font-size: 20;");
 
         // Letter input field
         letterInput = new TextField();
@@ -50,12 +50,9 @@ public class HangmanGame extends Application {
         VBox root = new VBox(10);
         root.setAlignment(Pos.CENTER);
         root.setPadding(new Insets(20));
-        root.getStyleClass().add("root");
         root.getChildren().addAll(hangmanContainer, guessedWordText, createInputPane());
 
         Scene scene = new Scene(root, 400, 300);
-        scene.getStylesheets().add("style.css");
-
         primaryStage.setTitle("Hangman Game");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -128,7 +125,6 @@ public class HangmanGame extends Application {
 
     private void showMessage(String message) {
         Text messageText = new Text(message);
-        messageText.getStyleClass().add("message");
         VBox root = (VBox) guessedWordText.getParent();
         root.getChildren().add(messageText);
     }
@@ -144,7 +140,6 @@ public class HangmanGame extends Application {
         if (incorrectGuesses >= 1) {
             Circle head = new Circle(20);
             head.setTranslateY(40);
-            head.getStyleClass().add("head");
             hangmanContainer.getChildren().add(head);
         }
 
@@ -154,7 +149,6 @@ public class HangmanGame extends Application {
             body.setStartY(60);
             body.setEndX(0);
             body.setEndY(140);
-            body.getStyleClass().add("body");
             hangmanContainer.getChildren().add(body);
         }
 
@@ -164,7 +158,6 @@ public class HangmanGame extends Application {
             leftArm.setStartY(80);
             leftArm.setEndX(-60);
             leftArm.setEndY(100);
-            leftArm.getStyleClass().add("arm");
             hangmanContainer.getChildren().add(leftArm);
         }
 
@@ -174,7 +167,6 @@ public class HangmanGame extends Application {
             rightArm.setStartY(80);
             rightArm.setEndX(60);
             rightArm.setEndY(100);
-            rightArm.getStyleClass().add("arm");
             hangmanContainer.getChildren().add(rightArm);
         }
 
@@ -184,7 +176,6 @@ public class HangmanGame extends Application {
             leftLeg.setStartY(160);
             leftLeg.setEndX(-60);
             leftLeg.setEndY(200);
-            leftLeg.getStyleClass().add("leg");
             hangmanContainer.getChildren().add(leftLeg);
         }
 
@@ -194,7 +185,6 @@ public class HangmanGame extends Application {
             rightLeg.setStartY(160);
             rightLeg.setEndX(60);
             rightLeg.setEndY(200);
-            rightLeg.getStyleClass().add("leg");
             hangmanContainer.getChildren().add(rightLeg);
         }
     }
@@ -217,6 +207,7 @@ public class HangmanGame extends Application {
         launch(args);
     }
 }
+
 
 
 

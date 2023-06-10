@@ -1,33 +1,37 @@
-/* Estilos para el contenedor principal */
-#hangmanContainer {
-    -fx-padding: 20px;
-    -fx-background-color: #f1f1f1;
-  }
-  
-  /* Estilos para el texto de la palabra adivinada */
-  #guessedWordText {
-    -fx-font-size: 24px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #333333;
-  }
-  
-  /* Estilos para el campo de entrada de letras */
-  .letterInput {
-    -fx-font-size: 16px;
-    -fx-pref-width: 60px;
-  }
-  
-  /* Estilos para el botón de adivinar */
-  .guessButton {
-    -fx-font-size: 16px;
-    -fx-pref-width: 100px;
-    -fx-background-color: #4caf50;
-    -fx-text-fill: white;
-  }
-  
-  /* Estilos para el mensaje mostrado en caso de ganar o perder */
-  .messageText {
-    -fx-font-size: 18px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #333333;
-  }
+.root {
+  -fx-background-color: #f2f2f2;
+}
+
+.guessed-word {
+  -fx-font-size: 89px;
+  -fx-font-weight: bold;
+  -fx-fill: #333333;
+}
+
+.message {
+  -fx-font-size: 89px;
+  -fx-font-weight: bold;
+  -fx-fill: red;
+  -fx-padding: 10px;
+}
+
+.head {
+  -fx-fill: #ff0000;
+  -fx-stroke: #000000;
+  -fx-stroke-width: 2px;
+}
+
+.body {
+  -fx-stroke: #000000;
+  -fx-stroke-width: 2px;
+}
+
+.arm {
+  -fx-stroke: #000000;
+  -fx-stroke-width: 5px;
+}
+
+.leg {
+  -fx-stroke: #000000;
+  -fx-stroke-width: 2px;
+}
