@@ -5,10 +5,10 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-public class Hang extends Application {
+public class HangmanGame extends Application {
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         Text text = new Text(0, 20, "Welcome to the Hangman Game!");
         text.setWrappingWidth(300);
         text.setTextAlignment(TextAlignment.CENTER);
@@ -17,9 +17,9 @@ public class Hang extends Application {
         primaryStage.setTitle("Hangman Game");
         primaryStage.setScene(scene);
         primaryStage.show();
-        
     }
-    public static void main(String[] args) {
-        Application.launch();
-    } 
+
+    public static void launchGame(String[] args) {
+        launch(args);
+    }
 }
