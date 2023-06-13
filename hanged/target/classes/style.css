@@ -1,0 +1,37 @@
+.root {
+  -fx-background-color: #f2f2f2;
+}
+
+.guessed-word {
+  -fx-font-size: 89px;
+  -fx-font-weight: bold;
+  -fx-fill: #333333;
+}
+
+.message {
+  -fx-font-size: 89px;
+  -fx-font-weight: bold;
+  -fx-fill: red;
+  -fx-padding: 10px;
+}
+
+.head {
+  -fx-fill: #ff0000;
+  -fx-stroke: #000000;
+  -fx-stroke-width: 2px;
+}
+
+.body {
+  -fx-stroke: #000000;
+  -fx-stroke-width: 2px;
+}
+
+.arm {
+  -fx-stroke: #000000;
+  -fx-stroke-width: 5px;
+}
+
+.leg {
+  -fx-stroke: #000000;
+  -fx-stroke-width: 2px;
+}

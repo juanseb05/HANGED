@@ -15,7 +15,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class HangmanGame extends Application {
-    private static final String SECRET_WORD = "HANGMAN";
+    private static final String SECRET_WORD = "HOME";
     private static final int MAX_ERRORS = 6;
 
     private int incorrectGuesses;
